@@ -1,0 +1,2186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>CIPHER | Crime Intelligence Analysis</title>
+
+    <style>
+        :root {
+            --bg: #f4f6f8;
+            --card: #fff;
+            --ink: #172638;
+            --muted: #7b8790;
+            --line: #e1e6ea;
+            --blue: #2d6293;
+            --red: #9d3038;
+            --amber: #9a6500;
+            --green: #2d7655;
+            --shadow: 0 8px 28px #1830440d;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--ink);
+            font: 13px Arial, sans-serif;
+        }
+
+        /* =========================
+           NAVIGATION BAR
+           ========================= */
+
+        .nav {
+            height: 70px;
+            background: #fff;
+            border-bottom: 1px solid var(--line);
+            display: flex;
+            align-items: center;
+            padding: 0 25px;
+            gap: 25px;
+            position: sticky;
+            top: 0;
+            z-index: 20;
+        }
+
+        .brand {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            min-width: 210px;
+        }
+
+        .logo {
+            width: 38px;
+            height: 38px;
+            border-radius: 11px;
+            background: #172638;
+            color: #fff;
+            display: grid;
+            place-items: center;
+            font-weight: 800;
+            font-size: 20px;
+        }
+
+        .brand b {
+            letter-spacing: 2px;
+            font-size: 16px;
+        }
+
+        .brand small {
+            display: block;
+            color: var(--muted);
+            font-size: 9px;
+            margin-top: 2px;
+        }
+
+        .links {
+            display: flex;
+            gap: 3px;
+            flex: 1;
+        }
+
+        .links a {
+            padding: 10px 11px;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #687581;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .links a:hover,
+        .links a.active {
+            background: #eef2f5;
+            color: #172638;
+        }
+
+        .badge {
+            background: #f7e7e8;
+            color: var(--red);
+            border-radius: 99px;
+            padding: 2px 6px;
+            font-size: 9px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 7px;
+        }
+
+        .btn {
+            border: 1px solid #d6dde2;
+            background: #fff;
+            border-radius: 8px;
+            padding: 9px 13px;
+            font-weight: 700;
+            font-size: 11px;
+            cursor: pointer;
+        }
+
+        .btn.primary,
+        .btn.dark {
+            background: #172638;
+            color: #fff;
+            border-color: #172638;
+        }
+
+        .hamb {
+            display: none;
+            border: 0;
+            background: none;
+            font-size: 22px;
+        }
+
+        /* =========================
+           MAIN LAYOUT
+           ========================= */
+
+        .wrap {
+            max-width: 1580px;
+            margin: auto;
+            padding: 18px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--line);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+        }
+
+        .case {
+            min-height: 82px;
+            padding: 15px 19px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 17px;
+        }
+
+        .eyebrow {
+            font-size: 9px;
+            color: var(--blue);
+            font-weight: 800;
+            letter-spacing: 1.3px;
+        }
+
+        .case h1 {
+            font-size: 19px;
+            margin: 4px 0;
+        }
+
+        .case p {
+            font-size: 10px;
+            color: var(--muted);
+            margin: 0;
+        }
+
+        .case-actions {
+            display: flex;
+            gap: 7px;
+            align-items: center;
+        }
+
+        .pill {
+            padding: 8px 11px;
+            border-radius: 99px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .suggested {
+            background: #fff2d5;
+            color: var(--amber);
+        }
+
+        .confirmed {
+            background: #e8f4ed;
+            color: var(--green);
+        }
+
+        /* =========================
+           DASHBOARD GRID
+           ========================= */
+
+        .grid {
+            display: grid;
+            grid-template-columns: 2.1fr 1fr;
+            grid-template-areas:
+                "graph profile"
+                "graph alerts"
+                "timeline timeline";
+            gap: 17px;
+        }
+
+        .graph {
+            grid-area: graph;
+            min-height: 650px;
+        }
+
+        .profile {
+            grid-area: profile;
+        }
+
+        .alerts {
+            grid-area: alerts;
+        }
+
+        .timeline {
+            grid-area: timeline;
+        }
+
+        /* =========================
+           CARD HEADERS
+           ========================= */
+
+        .head {
+            padding: 17px 19px 11px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .head h2 {
+            font-size: 15px;
+            margin: 0 0 4px;
+        }
+
+        .sub {
+            color: var(--muted);
+            font-size: 10px;
+            margin: 0;
+        }
+
+        /* =========================
+           GRAPH CONTROLS
+           ========================= */
+
+        .controls {
+            display: flex;
+            gap: 7px;
+            padding: 0 19px 11px;
+            flex-wrap: wrap;
+        }
+
+        .chip {
+            border: 1px solid #dce2e7;
+            background: #fff;
+            border-radius: 99px;
+            padding: 7px 10px;
+            font-size: 10px;
+            color: #61707b;
+            cursor: pointer;
+        }
+
+        .chip.active {
+            background: #eaf2f9;
+            color: var(--blue);
+            border-color: #c8dceb;
+            font-weight: 700;
+        }
+
+        .select {
+            border: 1px solid #dce2e7;
+            border-radius: 99px;
+            padding: 5px 9px;
+            color: #5e6a74;
+            font-size: 10px;
+        }
+
+        /* =========================
+           GRAPH
+           ========================= */
+
+        .stage {
+            height: 530px;
+            margin: 0 14px 14px;
+            border: 1px solid #edf0f2;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+
+            background-image:
+                linear-gradient(#26384505 1px, transparent 1px),
+                linear-gradient(90deg, #26384505 1px, transparent 1px);
+
+            background-size: 25px 25px;
+        }
+
+        .svg {
+            width: 100%;
+            height: 485px;
+        }
+
+        .edge {
+            stroke: #c5ccd2;
+            stroke-width: 2;
+        }
+
+        .edge.s {
+            stroke-dasharray: 7 7;
+            stroke: #b8c0c7;
+        }
+
+        .node {
+            cursor: pointer;
+        }
+
+        .node circle {
+            fill: #fff;
+            stroke: #ccd4da;
+            stroke-width: 1.5;
+        }
+
+        .node:hover circle {
+            stroke: #2d6293;
+            stroke-width: 2.5;
+        }
+
+        .node.sel circle {
+            fill: #f9eded;
+            stroke: #9d3038;
+            stroke-width: 3;
+        }
+
+        .node text {
+            text-anchor: middle;
+            dominant-baseline: middle;
+            font-size: 11px;
+            fill: #3a4852;
+            pointer-events: none;
+        }
+
+        .legend {
+            position: absolute;
+            bottom: 12px;
+            left: 18px;
+            color: #7c8790;
+            font-size: 9px;
+            display: flex;
+            gap: 16px;
+        }
+
+        .ldot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #9d3038;
+            margin-right: 5px;
+        }
+
+        .line {
+            display: inline-block;
+            width: 27px;
+            border-top: 2px solid #c4cbd1;
+            margin-right: 5px;
+        }
+
+        .dash {
+            border-top-style: dashed;
+        }
+
+        .tip {
+            position: absolute;
+            right: 16px;
+            bottom: 12px;
+            color: #a0a8ae;
+            font-size: 9px;
+        }
+
+        /* =========================
+           ENTITY PROFILE
+           ========================= */
+
+        .metrics {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 7px;
+            padding: 0 19px 15px;
+        }
+
+        .metrics span {
+            display: block;
+            color: #8b969e;
+            font-size: 9px;
+            margin-bottom: 5px;
+        }
+
+        .metrics b {
+            font-size: 16px;
+        }
+
+        .green {
+            color: var(--green);
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--line);
+        }
+
+        .rel {
+            padding: 15px 19px;
+        }
+
+        .rel h3 {
+            font-size: 11px;
+            margin: 0 0 10px;
+        }
+
+        .rel ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .rel li {
+            display: grid;
+            grid-template-columns: 1.1fr 1fr auto;
+            gap: 6px;
+            padding: 9px 0;
+            border-bottom: 1px solid #eef1f3;
+            font-size: 9px;
+        }
+
+        .rel li span {
+            color: #73808a;
+            font-weight: 700;
+        }
+
+        .rel li em {
+            font-style: normal;
+            color: var(--green);
+        }
+
+        .rel li em.sugg {
+            color: var(--amber);
+        }
+
+        .full {
+            width: calc(100% - 38px);
+            margin: 0 19px 18px;
+        }
+
+        /* =========================
+           ALERTS
+           ========================= */
+
+        .alerts .list {
+            padding: 0 19px 18px;
+            display: grid;
+            gap: 8px;
+        }
+
+        .alert {
+            width: 100%;
+            display: grid;
+            grid-template-columns: 10px 1fr 10px;
+            gap: 9px;
+            text-align: left;
+            background: #fff;
+            border: 1px solid #edf0f2;
+            border-radius: 10px;
+            padding: 11px;
+            cursor: pointer;
+        }
+
+        .alert:hover {
+            background: #fafcfd;
+        }
+
+        .alert .dot {
+            font-size: 24px;
+            line-height: 8px;
+        }
+
+        .high .dot {
+            color: var(--red);
+        }
+
+        .med .dot {
+            color: var(--amber);
+        }
+
+        .low .dot {
+            color: #8d979e;
+        }
+
+        .alert strong {
+            display: block;
+            font-size: 11px;
+        }
+
+        .alert small {
+            display: block;
+            color: #87929b;
+            font-size: 9px;
+            margin-top: 4px;
+        }
+
+        /* =========================
+           TIMELINE
+           ========================= */
+
+        .timeline {
+            min-height: 235px;
+        }
+
+        .track {
+            height: 105px;
+            margin: 15px 45px;
+            position: relative;
+        }
+
+        .track:before {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 55px;
+            height: 2px;
+            background: #d9dfe3;
+        }
+
+        .event {
+            position: absolute;
+            top: 9px;
+            transform: translateX(-50%);
+            text-align: center;
+            min-width: 90px;
+        }
+
+        .event b {
+            display: block;
+            font-size: 9px;
+            color: #7c8790;
+            margin-bottom: 22px;
+        }
+
+        .event i {
+            position: absolute;
+            top: 39px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #315e91;
+            border: 3px solid #fff;
+            box-shadow: 0 0 0 1px #d5dce1;
+        }
+
+        .event i.amber {
+            background: #a36b08;
+        }
+
+        .event i.red {
+            background: #9d3038;
+        }
+
+        .event small {
+            font-size: 9px;
+            color: #9aa3aa;
+        }
+
+        .note {
+            border-top: 1px solid #eef1f3;
+            margin: 0 19px;
+            padding: 12px 0 15px;
+            color: #89949c;
+            font-size: 9px;
+        }
+
+        /* =========================
+           MODAL
+           ========================= */
+
+        .modalbg[hidden] {
+        display: none;
+        }
+
+        .modal {
+            background: #fff;
+            width: min(470px, 100%);
+            border-radius: 16px;
+            padding: 25px;
+            position: relative;
+            box-shadow: 0 25px 70px #0003;
+        }
+
+        .close {
+            position: absolute;
+            right: 12px;
+            top: 8px;
+            border: 0;
+            background: none;
+            font-size: 25px;
+            color: #89949c;
+            cursor: pointer;
+        }
+
+        .modal h2 {
+            margin: 0 0 7px;
+            font-size: 19px;
+        }
+
+        .modal p {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.55;
+        }
+
+        .form {
+            display: grid;
+            gap: 11px;
+        }
+
+        .form label {
+            font-size: 10px;
+            font-weight: 700;
+            color: #5e6a74;
+        }
+
+        .form input {
+            display: block;
+            width: 100%;
+            margin-top: 5px;
+            padding: 10px;
+            border: 1px solid #d7dee4;
+            border-radius: 8px;
+        }
+
+        .box {
+            background: #f7f9fa;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 11px;
+            color: #5d6a74;
+            line-height: 1.65;
+        }
+
+        .modalfoot {
+            display: flex;
+            justify-content: flex-end;
+            gap: 7px;
+            margin-top: 16px;
+        }
+
+        /* =========================
+           TOAST
+           ========================= */
+
+        .toast {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            background: #172638;
+            color: #fff;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 11px;
+            opacity: 0;
+            transform: translateY(8px);
+            transition: 0.2s;
+            z-index: 80;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* =========================
+           RESPONSIVE DESIGN
+           ========================= */
+
+        @media (max-width: 1100px) {
+            .grid {
+                grid-template-columns: 1fr;
+                grid-template-areas:
+                    "graph"
+                    "profile"
+                    "alerts"
+                    "timeline";
+            }
+
+            .links a {
+                padding: 8px 7px;
+                font-size: 11px;
+            }
+        }
+
+        @media (max-width: 760px) {
+            .nav {
+                height: 64px;
+                padding: 0 14px;
+            }
+
+            .links {
+                display: none;
+                position: absolute;
+                top: 64px;
+                left: 0;
+                right: 0;
+                background: #fff;
+                padding: 8px;
+                flex-direction: column;
+                border-bottom: 1px solid var(--line);
+            }
+
+            .links.open {
+                display: flex;
+            }
+
+            .actions .btn {
+                display: none;
+            }
+
+            .hamb {
+                display: block;
+            }
+
+            .brand {
+                min-width: 0;
+            }
+
+            .brand small {
+                display: none;
+            }
+
+            .case {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .case-actions {
+                flex-wrap: wrap;
+            }
+
+            .wrap {
+                padding: 10px;
+            }
+
+            .stage {
+                height: 420px;
+            }
+
+            .svg {
+                height: 375px;
+            }
+
+            .legend {
+                max-width: 60%;
+                flex-wrap: wrap;
+                gap: 7px;
+            }
+
+            .tip {
+                display: none;
+            }
+
+            .metrics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .rel li {
+                grid-template-columns: 1fr;
+            }
+
+            .track {
+                margin: 15px 10px;
+                overflow-x: auto;
+            }
+
+            .event {
+                min-width: 70px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- =========================
+         NAVIGATION
+         ========================= -->
+
+    <header class="nav">
+
+        <div class="brand">
+            <div class="logo">C</div>
+
+            <div>
+                <b>CIPHER</b>
+                <small>Crime Intelligence Analysis</small>
+            </div>
+        </div>
+
+        <nav class="links" id="links">
+            <a class="active" href="#dashboard">Dashboard</a>
+            <a href="#cases">Cases</a>
+            <a href="#evidence">Evidence</a>
+            <a href="#graph">Graph Explorer</a>
+            <a href="#alerts">
+                Alerts <span class="badge">6</span>
+            </a>
+            <a href="#analytics">Analytics</a>
+            <a href="#audit">Audit</a>
+        </nav>
+
+        <div class="actions">
+            <button class="btn" id="login">Login</button>
+            <button class="btn primary" id="signup">Sign up</button>
+            <button class="hamb" id="hamb">☰</button>
+        </div>
+
+    </header>
+
+    <!-- =========================
+         MAIN CONTENT
+         ========================= -->
+
+    <main class="wrap" id="dashboard">
+
+        <!-- CASE HEADER -->
+
+        <section class="card case">
+
+            <div>
+                <div class="eyebrow">
+                    AUTHORIZED INVESTIGATION
+                </div>
+
+                <h1>
+                    Case 2026-0417 — Sector 9 network
+                </h1>
+
+                <p>
+                    Purpose: authorized investigation •
+                    Classification: restricted •
+                    Window: last 90 days
+                </p>
+            </div>
+
+            <div class="case-actions">
+
+                <span class="pill suggested">
+                    ● 6 suggested
+                </span>
+
+                <span class="pill confirmed">
+                    ● 14 confirmed
+                </span>
+
+                <button class="btn dark" id="export">
+                    Export
+                    <span style="color:#aeb7bf">
+                        (approval)
+                    </span>
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- =========================
+             DASHBOARD
+             ========================= -->
+
+        <section class="grid">
+
+            <!-- GRAPH EXPLORER -->
+
+            <article class="card graph" id="graph">
+
+                <div class="head">
+
+                    <div>
+                        <h2>Graph explorer</h2>
+
+                        <p class="sub">
+                            Evidence-linked relationships
+                            within the authorized case scope.
+                        </p>
+                    </div>
+
+                    <span class="sub">
+                        depth ≤ 3 • capped nodes
+                    </span>
+
+                </div>
+
+
+                <div class="controls">
+
+                    <button class="chip active">
+                        edges: all types
+                    </button>
+
+                    <button class="chip">
+                        90-day window
+                    </button>
+
+                    <select class="select" id="central">
+                        <option>
+                            centrality: betweenness
+                        </option>
+
+                        <option>
+                            centrality: degree
+                        </option>
+
+                        <option>
+                            centrality: pagerank
+                        </option>
+                    </select>
+
+                </div>
+
+
+                <div class="stage">
+
+                    <svg
+                        class="svg"
+                        viewBox="0 0 900 460"
+                    >
+
+                        <g id="edges">
+
+                            <line
+                                class="edge"
+                                x1="145"
+                                y1="92"
+                                x2="445"
+                                y2="210"
+                            />
+
+                            <line
+                                class="edge"
+                                x1="445"
+                                y1="210"
+                                x2="650"
+                                y2="92"
+                            />
+
+                            <line
+                                class="edge"
+                                x1="445"
+                                y1="210"
+                                x2="48"
+                                y2="345"
+                            />
+
+                            <line
+                                class="edge"
+                                x1="445"
+                                y1="210"
+                                x2="660"
+                                y2="335"
+                            />
+
+                            <line
+                                class="edge s"
+                                x1="445"
+                                y1="210"
+                                x2="335"
+                                y2="410"
+                            />
+
+                            <line
+                                class="edge s"
+                                x1="445"
+                                y1="210"
+                                x2="820"
+                                y2="55"
+                            />
+
+                            <line
+                                class="edge"
+                                x1="335"
+                                y1="410"
+                                x2="565"
+                                y2="435"
+                            />
+
+                        </g>
+
+
+                        <!-- A. SHETH -->
+
+                        <g
+                            class="node"
+                            data-name="A. Sheth"
+                            data-type="person"
+                        >
+                            <circle
+                                cx="145"
+                                cy="92"
+                                r="27"
+                            />
+
+                            <text
+                                x="145"
+                                y="97"
+                            >
+                                A. Sheth
+                            </text>
+                        </g>
+
+
+                        <!-- R. MALIK -->
+
+                        <g
+                            class="node sel"
+                            data-name="R. Malik"
+                            data-type="person"
+                        >
+
+                            <circle
+                                cx="445"
+                                cy="210"
+                                r="43"
+                            />
+
+                            <text
+                                x="445"
+                                y="205"
+                            >
+                                R. Malik
+                            </text>
+
+                            <text
+                                x="445"
+                                y="222"
+                                style="font-size:9px;fill:#87929b"
+                            >
+                                person
+                            </text>
+
+                        </g>
+
+
+                        <!-- WAREHOUSE -->
+
+                        <g
+                            class="node"
+                            data-name="Warehouse 4"
+                            data-type="location"
+                        >
+
+                            <circle
+                                cx="650"
+                                cy="92"
+                                r="29"
+                            />
+
+                            <text
+                                x="650"
+                                y="97"
+                            >
+                                Warehouse 4
+                            </text>
+
+                        </g>
+
+
+                        <!-- PHONE -->
+
+                        <g
+                            class="node"
+                            data-name="+91 98••"
+                            data-type="phone"
+                        >
+
+                            <circle
+                                cx="48"
+                                cy="345"
+                                r="29"
+                            />
+
+                            <text
+                                x="48"
+                                y="350"
+                            >
+                                +91 98••
+                            </text>
+
+                        </g>
+
+
+                        <!-- ACCOUNT -->
+
+                        <g
+                            class="node"
+                            data-name="Acct -482"
+                            data-type="account"
+                        >
+
+                            <circle
+                                cx="660"
+                                cy="335"
+                                r="31"
+                            />
+
+                            <text
+                                x="660"
+                                y="340"
+                            >
+                                Acct -482
+                            </text>
+
+                        </g>
+
+
+                        <!-- K. VERMA -->
+
+                        <g
+                            class="node"
+                            data-name="K. Verma"
+                            data-type="person"
+                        >
+
+                            <circle
+                                cx="335"
+                                cy="410"
+                                r="28"
+                            />
+
+                            <text
+                                x="335"
+                                y="415"
+                            >
+                                K. Verma
+                            </text>
+
+                        </g>
+
+
+                        <!-- DEPOT -->
+
+                        <g
+                            class="node"
+                            data-name="Depot 12"
+                            data-type="location"
+                        >
+
+                            <circle
+                                cx="565"
+                                cy="435"
+                                r="27"
+                            />
+
+                            <text
+                                x="565"
+                                y="440"
+                            >
+                                Depot 12
+                            </text>
+
+                        </g>
+
+
+                        <!-- VEHICLE -->
+
+                        <g
+                            class="node"
+                            data-name="Vehicle DL-9C"
+                            data-type="vehicle"
+                        >
+
+                            <circle
+                                cx="820"
+                                cy="55"
+                                r="30"
+                            />
+
+                            <text
+                                x="820"
+                                y="50"
+                            >
+                                Vehicle DL-9C
+                            </text>
+
+                            <text
+                                x="820"
+                                y="66"
+                                style="font-size:9px;fill:#87929b"
+                            >
+                                vehicle
+                            </text>
+
+                        </g>
+
+                    </svg>
+
+
+                    <div class="legend">
+
+                        <span>
+                            <i class="ldot"></i>
+                            high betweenness
+                        </span>
+
+                        <span>
+                            <i class="line dash"></i>
+                            suggested edge
+                        </span>
+
+                        <span>
+                            <i class="line"></i>
+                            confirmed edge
+                        </span>
+
+                    </div>
+
+
+                    <div class="tip">
+                        Click a node to inspect its profile.
+                    </div>
+
+                </div>
+
+            </article>
+
+
+            <!-- ENTITY PROFILE -->
+
+            <aside class="card profile">
+
+                <div class="head">
+
+                    <div>
+
+                        <h2>
+                            Entity profile
+                        </h2>
+
+                        <p class="sub" id="meta">
+                            R. Malik • status: confirmed •
+                            3 aliases • 11 mentions
+                        </p>
+
+                    </div>
+
+                    <span class="sub">
+                        •••
+                    </span>
+
+                </div>
+
+
+                <div class="metrics">
+
+                    <div>
+                        <span>degree</span>
+                        <b id="degree">7</b>
+                    </div>
+
+                    <div>
+                        <span>betweenness</span>
+                        <b id="between">0.81</b>
+                    </div>
+
+                    <div>
+                        <span>pagerank</span>
+                        <b id="page">0.44</b>
+                    </div>
+
+                    <div>
+                        <span>coverage</span>
+
+                        <b
+                            class="green"
+                            style="font-size:10px"
+                        >
+                            sufficient
+                        </b>
+
+                    </div>
+
+                </div>
+
+
+                <div class="divider"></div>
+
+
+                <div class="rel">
+
+                    <h3>
+                        Relationships
+                    </h3>
+
+                    <ul id="rels">
+
+                        <li>
+                            <span>
+                                COMMUNICATED_WITH
+                            </span>
+
+                            <b>
+                                → +91 98••
+                            </b>
+
+                            <em>
+                                confirmed
+                            </em>
+                        </li>
+
+                        <li>
+                            <span>
+                                LOCATED_AT
+                            </span>
+
+                            <b>
+                                → Warehouse 4
+                            </b>
+
+                            <em>
+                                confirmed
+                            </em>
+                        </li>
+
+                        <li>
+                            <span>
+                                OWNS
+                            </span>
+
+                            <b>
+                                → Vehicle DL-9C
+                            </b>
+
+                            <em class="sugg">
+                                suggested
+                            </em>
+                        </li>
+
+                        <li>
+                            <span>
+                                ASSOCIATED_WITH
+                            </span>
+
+                            <b>
+                                → K. Verma
+                            </b>
+
+                            <em>
+                                confirmed
+                            </em>
+                        </li>
+
+                    </ul>
+
+                </div>
+
+
+                <button
+                    class="btn full"
+                    id="evidence"
+                >
+                    View supporting evidence
+                </button>
+
+            </aside>
+
+
+            <!-- ALERTS -->
+
+            <aside
+                class="card alerts"
+                id="alerts"
+            >
+
+                <div class="head">
+
+                    <div>
+
+                        <h2>
+                            Alert inbox
+                        </h2>
+
+                        <p class="sub">
+                            Explainable candidates awaiting review.
+                        </p>
+
+                    </div>
+
+                    <span class="pill suggested">
+                        6
+                    </span>
+
+                </div>
+
+
+                <div class="list">
+
+                    <button
+                        class="alert high"
+                        data-title="Repeated contact burst"
+                    >
+
+                        <span class="dot">•</span>
+
+                        <span>
+
+                            <strong>
+                                Repeated contact burst
+                            </strong>
+
+                            <small>
+                                R. Malik ↔ unknown number,
+                                14 calls / 2 days
+                            </small>
+
+                        </span>
+
+                        <span>›</span>
+
+                    </button>
+
+
+                    <button
+                        class="alert med"
+                        data-title="Rapid location change"
+                    >
+
+                        <span class="dot">•</span>
+
+                        <span>
+
+                            <strong>
+                                Rapid location change
+                            </strong>
+
+                            <small>
+                                Vehicle DL-9C,
+                                3 cities in 6 hours
+                            </small>
+
+                        </span>
+
+                        <span>›</span>
+
+                    </button>
+
+
+                    <button
+                        class="alert low"
+                        data-title="Structuring pattern candidate"
+                    >
+
+                        <span class="dot">•</span>
+
+                        <span>
+
+                            <strong>
+                                Structuring pattern candidate
+                            </strong>
+
+                            <small>
+                                Acct -482,
+                                9 sub-threshold transfers
+                            </small>
+
+                        </span>
+
+                        <span>›</span>
+
+                    </button>
+
+                </div>
+
+            </aside>
+
+
+            <!-- TIMELINE -->
+
+            <article class="card timeline">
+
+                <div class="head">
+
+                    <div>
+
+                        <h2>
+                            Timeline
+                        </h2>
+
+                        <p class="sub">
+                            Key evidence events across the selected case window.
+                        </p>
+
+                    </div>
+
+                    <button
+                        class="btn"
+                        id="timelineBtn"
+                    >
+                        Open timeline
+                    </button>
+
+                </div>
+
+
+                <div class="track">
+
+                    <div
+                        class="event"
+                        style="left:10%"
+                    >
+                        <b>call record</b>
+                        <i></i>
+                        <small>Aug 03</small>
+                    </div>
+
+
+                    <div
+                        class="event"
+                        style="left:30%"
+                    >
+                        <b>FIR filed</b>
+                        <i></i>
+                        <small>Aug 11</small>
+                    </div>
+
+
+                    <div
+                        class="event"
+                        style="left:51%"
+                    >
+                        <b>location ping</b>
+                        <i class="amber"></i>
+                        <small>Aug 19</small>
+                    </div>
+
+
+                    <div
+                        class="event"
+                        style="left:73%"
+                    >
+                        <b>transaction</b>
+                        <i></i>
+                        <small>Aug 27</small>
+                    </div>
+
+
+                    <div
+                        class="event"
+                        style="left:94%"
+                    >
+                        <b>alert raised</b>
+                        <i class="red"></i>
+                        <small>Sep 02</small>
+                    </div>
+
+                </div>
+
+
+                <p class="note">
+                    Every node, edge, and alert links back to its
+                    source evidence and reviewer status —
+                    nothing shown here is presented as fact before
+                    human confirmation.
+                </p>
+
+            </article>
+
+        </section>
+
+    </main>
+
+
+    <!-- =========================
+         MODAL
+         ========================= -->
+
+    <div
+        class="modalbg"
+        id="modal"
+        hidden
+    >
+
+        <div class="modal">
+
+            <button
+                class="close"
+                id="close"
+            >
+                ×
+            </button>
+
+            <div id="modalBody"></div>
+
+        </div>
+
+    </div>
+
+
+    <div
+        class="toast"
+        id="toast"
+    ></div>
+
+
+    <!-- =========================
+         JAVASCRIPT
+         ========================= -->
+
+    <script>
+
+        const data = {
+            "R. Malik": [
+                "confirmed",
+                3,
+                11,
+                7,
+                0.81,
+                0.44,
+                [
+                    [
+                        "COMMUNICATED_WITH",
+                        "+91 98••",
+                        "confirmed"
+                    ],
+                    [
+                        "LOCATED_AT",
+                        "Warehouse 4",
+                        "confirmed"
+                    ],
+                    [
+                        "OWNS",
+                        "Vehicle DL-9C",
+                        "suggested"
+                    ],
+                    [
+                        "ASSOCIATED_WITH",
+                        "K. Verma",
+                        "confirmed"
+                    ]
+                ]
+            ],
+
+            "A. Sheth": [
+                "confirmed",
+                1,
+                4,
+                2,
+                0.32,
+                0.19,
+                [
+                    [
+                        "ASSOCIATED_WITH",
+                        "R. Malik",
+                        "confirmed"
+                    ]
+                ]
+            ],
+
+            "Warehouse 4": [
+                "confirmed",
+                0,
+                6,
+                2,
+                0.28,
+                0.11,
+                [
+                    [
+                        "LOCATED_AT",
+                        "R. Malik",
+                        "confirmed"
+                    ]
+                ]
+            ],
+
+            "+91 98••": [
+                "confirmed",
+                0,
+                8,
+                3,
+                0.39,
+                0.16,
+                [
+                    [
+                        "COMMUNICATED_WITH",
+                        "R. Malik",
+                        "confirmed"
+                    ]
+                ]
+            ],
+
+            "Acct -482": [
+                "confirmed",
+                0,
+                9,
+                2,
+                0.21,
+                0.09,
+                [
+                    [
+                        "ASSOCIATED_WITH",
+                        "R. Malik",
+                        "confirmed"
+                    ]
+                ]
+            ],
+
+            "K. Verma": [
+                "suggested",
+                2,
+                5,
+                2,
+                0.24,
+                0.08,
+                [
+                    [
+                        "ASSOCIATED_WITH",
+                        "R. Malik",
+                        "suggested"
+                    ],
+                    [
+                        "LOCATED_AT",
+                        "Depot 12",
+                        "confirmed"
+                    ]
+                ]
+            ],
+
+            "Depot 12": [
+                "confirmed",
+                0,
+                3,
+                1,
+                0.12,
+                0.04,
+                [
+                    [
+                        "LOCATED_AT",
+                        "K. Verma",
+                        "confirmed"
+                    ]
+                ]
+            ],
+
+            "Vehicle DL-9C": [
+                "suggested",
+                1,
+                5,
+                1,
+                0.15,
+                0.06,
+                [
+                    [
+                        "OWNS",
+                        "R. Malik",
+                        "suggested"
+                    ]
+                ]
+            ]
+        };
+
+
+        const $ = selector =>
+            document.querySelector(selector);
+
+        const $$ = selector =>
+            [...document.querySelectorAll(selector)];
+
+
+        function toast(message) {
+
+            const element = $("#toast");
+
+            element.textContent = message;
+
+            element.classList.add("show");
+
+            clearTimeout(window.tt);
+
+            window.tt = setTimeout(() => {
+                element.classList.remove("show");
+            }, 2200);
+        }
+
+
+        function selectNode(name) {
+
+            $$(".node").forEach(node => {
+
+                node.classList.toggle(
+                    "sel",
+                    node.dataset.name === name
+                );
+
+            });
+
+
+            const d = data[name] || data["R. Malik"];
+
+
+            $("#meta").textContent =
+                `${name} • status: ${d[0]} • ${d[1]} aliases • ${d[2]} mentions`;
+
+
+            $("#degree").textContent = d[3];
+
+            $("#between").textContent = d[4];
+
+            $("#page").textContent = d[5];
+
+
+            $("#rels").innerHTML =
+                d[6]
+                    .map(r => `
+                        <li>
+                            <span>${r[0]}</span>
+                            <b>→ ${r[1]}</b>
+                            <em class="${r[2] === "suggested" ? "sugg" : ""}">
+                                ${r[2]}
+                            </em>
+                        </li>
+                    `)
+                    .join("");
+
+
+            toast("Selected entity: " + name);
+        }
+
+
+        function modal(html) {
+
+            $("#modalBody").innerHTML = html;
+
+            $("#modal").hidden = false;
+        }
+
+
+        function close() {
+
+            $("#modal").hidden = true;
+        }
+
+
+        /* GRAPH NODES */
+
+        $$(".node").forEach(node => {
+
+            node.onclick = () => {
+                selectNode(node.dataset.name);
+            };
+
+        });
+
+
+        /* GRAPH FILTER CHIPS */
+
+        $$(".chip").forEach(chip => {
+
+            chip.onclick = () => {
+
+                $$(".chip").forEach(item => {
+                    item.classList.remove("active");
+                });
+
+                chip.classList.add("active");
+
+                toast(
+                    chip.textContent.trim() +
+                    " selected."
+                );
+            };
+
+        });
+
+
+        /* CENTRALITY SELECT */
+
+        $("#central").onchange = event => {
+
+            toast(
+                event.target.value +
+                " selected."
+            );
+
+        };
+
+
+        /* SUPPORTING EVIDENCE */
+
+        $("#evidence").onclick = () => {
+
+            modal(`
+                <h2>Supporting evidence</h2>
+
+                <p>
+                    Prototype evidence view for the selected entity.
+                    Production records should always link claims back
+                    to immutable source evidence and reviewer status.
+                </p>
+
+                <div class="box">
+                    <b>Source:</b> Case_Report_17.pdf<br>
+                    <b>Location:</b> Page 4 • paragraph 2<br>
+                    <b>Processing run:</b> EX-2026-0417-009<br>
+                    <b>Status:</b> Reviewable / evidence-linked
+                </div>
+            `);
+
+        };
+
+
+        /* EXPORT */
+
+        $("#export").onclick = () => {
+
+            modal(`
+                <h2>Export requires approval</h2>
+
+                <p>
+                    Exports are controlled actions in the CIPHER design.
+                    The prototype demonstrates an approval step before
+                    an evidence package can leave the case workspace.
+                </p>
+
+                <div class="box">
+                    <b>Case:</b> 2026-0417<br>
+                    <b>Classification:</b> Restricted<br>
+                    <b>Package:</b> Evidence summary + reviewed relationships
+                </div>
+
+                <div class="modalfoot">
+
+                    <button
+                        class="btn"
+                        onclick="close()"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        class="btn primary"
+                        onclick="close();toast('Approval request recorded in demo mode.')"
+                    >
+                        Request approval
+                    </button>
+
+                </div>
+            `);
+
+        };
+
+
+        /* ALERT DATA */
+
+        const desc = {
+
+            "Repeated contact burst":
+                "14 calls with an unknown number in two days. This is a candidate pattern, not a conclusion.",
+
+            "Rapid location change":
+                "Vehicle DL-9C appears at three locations within six hours in the demo timeline.",
+
+            "Structuring pattern candidate":
+                "Account -482 shows 9 sub-threshold transfers in the selected window."
+
+        };
+
+
+        /* ALERT MODALS */
+
+        $$(".alert").forEach(alert => {
+
+            alert.onclick = () => {
+
+                modal(`
+                    <h2>
+                        ${alert.dataset.title}
+                    </h2>
+
+                    <p>
+                        ${desc[alert.dataset.title]}
+                    </p>
+
+                    <div class="box">
+
+                        <b>Status:</b> Provisional<br>
+
+                        <b>Rule/model:</b>
+                        DEMO-RULE-v1.0<br>
+
+                        <b>Human action:</b>
+                        Confirm, reject, or annotate
+
+                    </div>
+
+                    <div class="modalfoot">
+
+                        <button
+                            class="btn"
+                            onclick="close()"
+                        >
+                            Reject
+                        </button>
+
+                        <button
+                            class="btn primary"
+                            onclick="close();toast('Marked for investigator review.')"
+                        >
+                            Confirm for review
+                        </button>
+
+                    </div>
+                `);
+
+            };
+
+        });
+
+
+        /* LOGIN / SIGNUP */
+
+        $("#login").onclick = () => auth(false);
+
+        $("#signup").onclick = () => auth(true);
+
+
+        function auth(sign) {
+
+            modal(`
+                <h2>
+                    ${sign
+                        ? "Create a CIPHER account"
+                        : "Sign in to CIPHER"
+                    }
+                </h2>
+
+                <p>
+                    This is a frontend prototype.
+                    Production authentication should use
+                    an approved OIDC/SSO provider.
+                </p>
+
+                <form
+                    class="form"
+                    id="auth"
+                >
+
+                    ${
+                        sign
+                            ? `
+                                <label>
+                                    Full name
+
+                                    <input
+                                        required
+                                        placeholder="Investigator name"
+                                    >
+                                </label>
+                            `
+                            : ""
+                    }
+
+
+                    <label>
+
+                        Email
+
+                        <input
+                            required
+                            type="email"
+                            placeholder="name@organization.gov"
+                        >
+
+                    </label>
+
+
+                    <label>
+
+                        Password
+
+                        <input
+                            required
+                            type="password"
+                            placeholder="••••••••"
+                        >
+
+                    </label>
+
+
+                    <button
+                        class="btn primary"
+                        type="submit"
+                    >
+                        ${
+                            sign
+                                ? "Create prototype account"
+                                : "Login"
+                        }
+                    </button>
+
+                </form>
+            `);
+
+
+            $("#auth").onsubmit = event => {
+
+                event.preventDefault();
+
+                close();
+
+                toast(
+                    sign
+                        ? "Prototype account created."
+                        : "Logged in to demo mode."
+                );
+
+            };
+
+        }
+
+
+        /* TIMELINE */
+
+        $("#timelineBtn").onclick = () => {
+
+            toast(
+                "Timeline detail opened in demo mode."
+            );
+
+        };
+
+
+        /* MODAL CLOSE */
+
+        $("#close").onclick = close;
+
+
+        $("#modal").onclick = event => {
+
+            if (event.target.id === "modal") {
+                close();
+            }
+
+        };
+
+
+        /* MOBILE MENU */
+
+        $("#hamb").onclick = () => {
+
+            $("#links").classList.toggle("open");
+
+        };
+
+    </script>
+
+</body>
+
+</html>
